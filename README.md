@@ -18,7 +18,7 @@ copy it manually
 * Instead of cli running, you can find the main project `Application.scala`, then right click and choose `Run 'Application'`
 * When running the project, in console you see a question to enter you query string
 
-#Prerequisite
+# Prerequisite
 * Install `rabbitmq`, config and start it's service 
 * Make sure the `morse-service` is up and running
 * In this version, port of rabbitmq is default at `15672` and can not be changed
