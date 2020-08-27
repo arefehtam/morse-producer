@@ -1,5 +1,6 @@
 # Morse-Producer
 
+This is written in `scala`.
 In order to run this project(preferably install InteliJIdea community edition):
 
 * Install `sbt`. (For more info, click [here] [1])
@@ -18,7 +19,6 @@ copy it manually
 * When running the project, in console you see a question to enter you query string
 
 #Prerequisite
-
 * Install `rabbitmq`, config and start it's service 
 * Make sure the `morse-service` is up and running
 * In this version, port of rabbitmq is default at `15672` and can not be changed
