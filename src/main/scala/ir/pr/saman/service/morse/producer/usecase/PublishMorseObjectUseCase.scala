@@ -38,7 +38,6 @@ trait PublishMorseObjectUseCase extends PublishMorseObjectService {
   override def call(body: MorseObject)(implicit ec: ExecutionContext): Future[Done] = {
     //todo: correct port problem
     val connectionProvider = AmqpUriConnectionProvider(s"amqp://$user:$password@$host")
-    //)
     val qName = queueName
     //+ System.currentTimeMillis()
     val queueDeclaration = QueueDeclaration(qName)
