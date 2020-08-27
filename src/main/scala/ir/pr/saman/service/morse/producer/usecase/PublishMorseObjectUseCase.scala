@@ -26,9 +26,21 @@ trait PublishMorseObjectUseCase extends PublishMorseObjectService {
 
   val logger = Logger("Publisher")
 
+  /**
+    * It publishes morse object in a queue so the consumer can receive and consume it
+    * @param body: contains morse object to publish
+    * @param ec: implicit execution context for asynchronous communication with morse service
+    * @return Done: this is the akka lib object in case of successful operation
+    * In case of connection error, ServiceUnavailableException object is returned,
+    * For other errors, their corresponding object is returned
+    */
+
   override def call(body: MorseObject)(implicit ec: ExecutionContext): Future[Done] = {
-    val connectionProvider = AmqpLocalConnectionProvider
-    val qName = queueName + System.currentTimeMillis()
+    //todo: correct port problem
+    val connectionProvider = AmqpUriConnectionProvider(s"amqp://$user:$password@$host")
+    //)
+    val qName = queueName
+    //+ System.currentTimeMillis()
     val queueDeclaration = QueueDeclaration(qName)
     val settings = AmqpWriteSettings(connectionProvider)
       .withRoutingKey(qName)
@@ -37,18 +49,19 @@ trait PublishMorseObjectUseCase extends PublishMorseObjectService {
       .withConfirmationTimeout(200.millis)
     val amqpFlow: Flow[WriteMessage, WriteResult, Future[Done]] = AmqpFlow.withConfirm(settings)
 
-    logger.info("Publishing to RabbitMQ")
+    logger info "Publishing to RabbitMQ"
     Source(Vector(body))
       .map(message => createMessage(message))
       .via(amqpFlow)
       .runWith(Sink.ignore)
       .recoverWith {
         case exp: ConnectException => Future failed exception.ServiceUnavailableException(exp + "\n" + queueName)
+        case e: Throwable => Future failed e
       }
   }
 
   private def createMessage(body: MorseObject): WriteMessage = {
-    val jsonFormat: Json = Json(DefaultFormats)
+    val jsonFormat = Json(DefaultFormats)
     WriteMessage(ByteString(jsonFormat.write(body)))
   }
 }
